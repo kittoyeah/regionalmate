@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RegionalMate — Single Page Flow</title>
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --panel: #121318;
+      --text: #e9eef3;
+      --muted: #b6c0cc;
+      --brand: #7dd3fc;
+      --brand-2: #22d3ee;
+      --ok: #34d399;
+      --ring: 0 0 0 3px rgba(125, 211, 252, .25);
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+      --card-h: 480px;
+      --sidebar-w: 400px;
+      --sidebar-min-w: 300px;
+      --sidebar-max-w: 60vw;
+      --card-pb: 20px;
+      --resizer-w: 4px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"
+    }
+
+    a {
+      color: var(--brand)
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 56px 20px
+    }
+
+    .center {
+      text-align: center
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0 0 18px
+    }
+
+    h1 {
+      font-size: 72px;
+      letter-spacing: .5px
+    }
+
+    h2 {
+      font-size: 30px
+    }
+
+    section {
+      padding: 80px 0;
+      border-top: 1px solid #1e293b80
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 18px;
+      margin-bottom: 32px;
+    }
+
+    /* Top bar */
+    .topbar {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      left: 10px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      z-index: 40
+    }
+
+    .icon-btn {
+      border: 1px solid #263244;
+      background: #0d1116;
+      color: #c9d6e2;
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: .2s transform
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px)
+    }
+
+    /* FAQ Drawer */
+    .faq {
+      position: fixed;
+      top: 70px;
+      right: 14px;
+      width: 360px;
+      max-width: 92vw;
+      background: var(--panel);
+      border: 1px solid #2a3644;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      display: none;
+      z-index: 60
+    }
+
+    .faq.open {
+      display: block
+    }
+
+    .faq header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #233044;
+      font-weight: 600
+    }
+
+    .faq .body {
+      padding: 8px 16px 18px
+    }
+
+    details {
+      background: #0f131a;
+      border: 1px solid #223046;
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin: 10px 0
+    }
+
+    summary {
+      cursor: pointer
+    }
+
+    /* First page full-screen */
+    #step1 {
+      min-height: 100vh;
+      display: grid;
+      place-items: start center;
+      border-top: none;
+      padding: 0 20px;
+      padding-top: 15vh;
+    }
+
+    #step1 .container {
+      padding: 0
+    }
+
+    /* Inputs */
+    .field {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 18px auto;
+      flex-wrap: wrap
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    input[type="search"] {
+      background: #0f131a;
+      border: 1px solid #223046;
+      border-radius: 12px;
+      color: #e9eef3;
+      padding: 12px 14px;
+      min-width: 260px;
+      outline: none;
+    }
+
+    input[type="number"] {
+      min-width: 140px
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    input[type="search"]:focus {
+      box-shadow: var(--ring);
+      border-color: #2f91ff66
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      border: 0;
+      color: #0b1220;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer
+    }
+
+    .btn:disabled {
+      opacity: .6;
+      cursor: not-allowed
+    }
+
+    /* Grids */
+    .grid {
+      display: grid;
+      gap: 18px;
+      align-items: stretch
+    }
+
+    #cityGrid {
+      grid-template-columns: repeat(3, 1fr)
+    }
+
+    #jobGrid {
+      grid-template-columns: repeat(2, 1fr)
+    }
+
+    #placeGrid {
+      grid-template-columns: repeat(2, 1fr)
+    }
+
+    /* Cards */
+    .card {
+      background: var(--panel);
+      border: 1px solid #223046;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      height: var(--card-h);
+      box-shadow: var(--shadow);
+      overflow: hidden
+    }
+
+    .thumb {
+      height: 160px;
+      background: #0e1622;
+      display: block;
+      overflow: hidden
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      padding: 14px 14px var(--card-pb)
+    }
+
+    .body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 120px;
+      overflow: hidden
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700
+    }
+
+    .meta {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .actions {
+      margin-top: auto;
+      display: flex;
+      justify-content: flex-start
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 1px solid #2a3644;
+      border-radius: 999px;
+      background: #0f141d;
+      font-size: 12px;
+      color: #cce7ff
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid #2a3644;
+      border-radius: 8px;
+      background: #0f141d;
+      font-size: 14px;
+      color: var(--text);
+      margin: 4px 0;
+    }
+
+    .chip .icon-btn {
+      padding: 4px;
+      margin-left: 4px;
+      font-size: 12px;
+      min-width: auto;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chip .icon-btn:hover {
+      background: #ff4757;
+      color: white;
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      height: calc(100vh - 72px);
+      gap: 0;
+      align-items: stretch;
+    }
+
+    .layout.hidden {
+      display: none !important;
+    }
+
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px;
+    }
+
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-min-w);
+      max-width: var(--sidebar-max-w);
+      overflow-y: auto;
+      background: var(--panel);
+      border-left: 1px solid #223046;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: width 0.2s ease;
+      display: none;
+      flex-direction: column;
+    }
+
+    .sidebar.visible {
+      display: flex;
+    }
+
+    .sidebar.collapsed {
+      width: 0;
+      min-width: 0;
+      padding: 0;
+      border: none;
+      overflow: hidden;
+    }
+
+    /* Resize handle */
+    .resize-handle {
+      width: var(--resizer-w);
+      background: #223046;
+      cursor: col-resize;
+      position: relative;
+      flex-shrink: 0;
+      transition: background-color 0.2s ease;
+      display: none;
+    }
+
+    .resize-handle.visible {
+      display: block;
+    }
+
+    .resize-handle:hover {
+      background: var(--brand);
+    }
+
+    .resize-handle.resizing {
+      background: var(--brand-2);
+    }
+
+    .resize-handle::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -2px;
+      right: -2px;
+      bottom: 0;
+      cursor: col-resize;
+    }
+
+    /* Toggle icon on resize handle */
+    .resize-toggle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #0b1220;
+      border: 1px solid #2a3644;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease;
+    }
+
+    .resize-toggle:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    /* Full page sidebar mode */
+    .layout.sidebar-fullpage {
+      position: relative;
+    }
+
+    .layout.sidebar-fullpage .main-content {
+      display: none;
+    }
+
+    .layout.sidebar-fullpage .resize-handle {
+      display: none;
+    }
+
+    .layout.sidebar-fullpage .sidebar {
+      position: fixed;
+      top: 72px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw !important;
+      max-width: none !important;
+      height: calc(100vh - 72px);
+      z-index: 100;
+      padding: 40px 60px;
+    }
+
+    /* Enhanced sidebar styling for full page mode */
+    .layout.sidebar-fullpage .sidebar h3 {
+      font-size: 24px;
+      margin: 40px 0 20px 0;
+    }
+
+    .layout.sidebar-fullpage .sidebar h3:first-child {
+      margin-top: 0;
+      font-size: 32px;
+    }
+
+    .layout.sidebar-fullpage #chips {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .layout.sidebar-fullpage .chip {
+      padding: 16px 20px;
+      font-size: 16px;
+      min-height: 60px;
+      border: 2px solid #223046;
+      background: var(--panel);
+      border-radius: 12px;
+    }
+
+    .layout.sidebar-fullpage .chip .icon-btn {
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+    }
+
+    .layout.sidebar-fullpage .city-info {
+      padding: 24px;
+      font-size: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      border: 2px solid #223046;
+    }
+
+    .layout.sidebar-fullpage .chat {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #223046;
+    }
+
+    .layout.sidebar-fullpage .chat-log {
+      height: 400px;
+      padding: 20px;
+      border: 2px solid #223046;
+    }
+
+    .layout.sidebar-fullpage .chat-input {
+      max-width: 600px;
+      margin: 20px auto 0;
+    }
+
+    /* Sidebar toggle button */
+    .sidebar-toggle {
+      position: fixed;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #0b1220;
+      border: 1px solid #2a3644;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 120;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease;
+    }
+
+    .sidebar-toggle:hover {
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .layout.sidebar-collapsed .sidebar-toggle {
+      display: flex;
+    }
+
+    /* Back button for full page mode */
+    .sidebar-back {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #0b1220;
+      border: 1px solid #2a3644;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 150;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease;
+    }
+
+    .layout.sidebar-fullpage .sidebar-back {
+      display: flex;
+    }
+
+    .sidebar-back:hover {
+      transform: scale(1.1);
+    }
+
+    /* Place filters - improved layout */
+    .filters {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px;
+      background: var(--panel);
+      border: 1px solid #223046;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      min-width: 160px;
+    }
+
+    .filter-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--brand);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .price-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      min-width: 200px;
+    }
+
+    .price-inputs {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .price-inputs input {
+      min-width: 90px;
+      max-width: 90px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .price-separator {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      margin: 0 4px;
+    }
+
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      min-width: 140px;
+    }
+
+    .select-group select {
+      min-width: 120px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .keyword-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 700px;
+      align-items: center;
+    }
+
+    .keyword-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--brand);
+      text-align: center;
+    }
+
+    .keyword-input {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .keyword-input input {
+      flex: 1;
+      min-width: 0;
+      font-size: 15px;
+      padding: 14px 16px;
+    }
+
+    .search-button {
+      min-width: 140px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    /* Responsive filters */
+    @media (max-width: 768px) {
+      .filters {
+        padding: 24px 16px;
+        margin: 0 10px;
+      }
+
+      .filter-row {
+        flex-direction: column;
+        gap: 24px;
+        align-items: center;
+      }
+
+      .price-inputs {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .price-separator {
+        display: none;
+      }
+
+      .keyword-input {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .search-button {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+
+    /* ===== hover animations  */
+    :root {
+      --motion-fast: 180ms;
+      --ease-smooth: cubic-bezier(.22, .61, .36, 1);
+      --shadow-lg: 0 14px 40px rgba(0, 0, 0, .45);
+    }
+
+    .btn,
+    .icon-btn,
+    .card {
+      transition:
+        transform var(--motion-fast) var(--ease-smooth),
+        box-shadow var(--motion-fast) var(--ease-smooth),
+        filter var(--motion-fast) var(--ease-smooth);
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-1px) scale(1.04);
+      box-shadow: var(--shadow);
+      filter: brightness(1.03);
+    }
+
+    .icon-btn:hover,
+    .icon-btn:focus-visible {
+      transform: translateY(-1px) scale(1.06);
+    }
+
+    .card {
+      transform-origin: center;
+    }
+
+    .card:hover,
+    .card:focus-within {
+      transform: translateY(-2px) scale(1.015);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(0.995);
+    }
+
+    .card:active {
+      transform: translateY(0) scale(1.005);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .btn,
+      .icon-btn,
+      .card {
+        transition: none !important;
+      }
+    }
+
+    /* ===== Tasmania-inspired logo ===== */
+    .logo {
+      background: linear-gradient(135deg,
+          #2d5a3d 0%,
+          /* Deep forest green */
+          #4a7c59 25%,
+          /* Medium forest green */
+          #1e3a5f 50%,
+          /* Deep ocean blue */
+          #3b6b9c 75%,
+          /* Lighter ocean blue */
+          #2d5a3d 100%
+          /* Back to forest green */
+        );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: none;
+      letter-spacing: .5px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .logo:hover {
+      transition: transform 200ms var(--ease-smooth);
+      transform: scale(1.02);
+      filter: brightness(1.1);
+    }
+
+    /* Chat suggestion buttons */
+    .chat-suggestions {
+      margin: 20px 0;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-suggestions.visible {
+      display: flex;
+    }
+
+    .chat-suggestions h4 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      color: var(--brand);
+      text-align: center;
+    }
+
+    .suggestion-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .suggestion-btn {
+      background: var(--bg);
+      border: 1px solid var(--brand);
+      color: var(--brand);
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: left;
+      transition: all 0.2s ease;
+      line-height: 1.4;
+    }
+
+    .suggestion-btn:hover {
+      background: var(--brand);
+      color: #0b1220;
+      transform: translateY(-1px);
+    }
+
+    .suggestion-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Enhanced full page mode styling for suggestions */
+    .layout.sidebar-fullpage .chat-suggestions h4 {
+      font-size: 18px;
+    }
+
+    .layout.sidebar-fullpage .suggestion-btn {
+      padding: 16px 20px;
+      font-size: 15px;
+    }
+
+    /* Sidebar content styling */
+    .sidebar h3 {
+      font-size: 18px;
+      margin: 20px 0 12px 0;
+      color: var(--brand);
+    }
+
+    .sidebar h3:first-child {
+      margin-top: 0;
+    }
+
+    #chips {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .city-info {
+      background: var(--bg);
+      border: 1px solid #223046;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 10px 0;
+    }
+
+    .city-info div {
+      margin: 4px 0;
+    }
+
+    .chat {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #223046;
+    }
+
+    .chat-log {
+      height: 200px;
+      max-width: none;
+      background: var(--panel);
+      border: 1px solid #223046;
+      border-radius: 8px;
+      padding: 15px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .chat-input input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .chat-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .export-btn {
+      background: linear-gradient(135deg, var(--ok), #10b981);
+      border: 0;
+      color: #0b1220;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .export-btn:hover {
+      transform: translateY(-1px) scale(1.04);
+      box-shadow: var(--shadow);
+      filter: brightness(1.03);
+    }
+
+    .export-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Enhanced full page mode styling for export button */
+    .layout.sidebar-fullpage .export-btn {
+      padding: 14px 20px;
+      font-size: 15px;
+    }
+
+    /* Chat history */
+    .chat-item {
+      margin: 10px 0;
+    }
+
+    .who {
+      font-weight: 600;
+      color: var(--brand);
+    }
+
+    /* Bottom sheet for mobile */
+    @media (max-width: 768px) {
+      .layout {
+        position: relative;
+        height: auto;
+        padding-bottom: 80px;
+      }
+
+      .main-content {
+        padding: 0 10px;
+      }
+
+      .sidebar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: none;
+        border-left: none;
+        border-top: 1px solid #223046;
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, .3);
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        z-index: 100;
+      }
+
+      .sidebar h3 {
+        margin-top: 0;
+      }
+
+      .chat-log {
+        height: 150px;
+      }
+
+      .chat-input {
+        position: relative;
+        width: 100%;
+        padding: 0 10px;
+        margin-top: 10px;
+      }
+
+      .chat-input input {
+        padding: 12px 14px;
+        width: calc(100% - 80px);
+      }
+
+      .chat-actions {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .btn {
+        flex: 1;
+      }
+
+      .export-btn {
+        flex: 0 0 120px;
+      }
+    }
+
+    /* Dark mode adjustments */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1116;
+        --panel: #161b22;
+        --text: #e2e6ea;
+        --muted: #8b949e;
+        --brand: #7dd3fc;
+        --brand-2: #22d3ee;
+        --ok: #34d399;
+        --ring: 0 0 0 3px rgba(125, 211, 252, .25);
+        --radius: 16px;
+        --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+      }
+
+      .topbar {
+        background: #161b22;
+        border-bottom: 1px solid #223046;
+      }
+
+      .faq {
+        background: #161b22;
+        border: 1px solid #2a3644;
+      }
+
+      .btn,
+      .icon-btn,
+      .export-btn {
+        background: linear-gradient(135deg, var(--brand), var(--brand-2));
+        color: #0b1220;
+      }
+
+      .btn:hover,
+      .icon-btn:hover,
+      .export-btn:hover {
+        filter: brightness(1.03);
+      }
+
+      .card {
+        background: #161b22;
+        border: 1px solid #223046;
+      }
+
+      .chip {
+        background: #0f141d;
+        border: 1px solid #2a3644;
+      }
+
+      .insight {
+        background: #0f141d;
+        border-left: 4px solid #22d3ee;
+      }
+
+      .action-list li {
+        background: #e3f2fd;
+        border-left: 4px solid #7dd3fc;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <button class="icon-btn" id="openFaq" title="FAQ">❓</button>
+  </div>
+  <aside class="faq" id="faqPanel" aria-hidden="true">
+    <header>FAQs</header>
+    <div class="body">
+      <details open>
+        <summary>What is RegionalMate?</summary>
+        <div class="muted">A single-page assistant that helps you decide where to live by comparing cities, jobs and
+          housing in one smooth flow.</div>
+      </details>
+      <details>
+        <summary>How do I use it?</summary>
+        <div class="muted">Fill the prompts step-by-step. When you finish one step, the page auto-scrolls to the next.
+          Everything you choose appears on the right sidebar.</div>
+      </details>
+      <details>
+        <summary>Can I change choices later?</summary>
+        <div class="muted">Absolutely. Scroll back up, change anything, and the sidebar will update.</div>
+      </details>
+    </div>
+  </aside>
+
+  <!-- STEP 1: Fullscreen hero -->
+  <section id="step1">
+    <div class="container center">
+      <h1 class="logo">RegionalMate</h1>
+      <p class="lead">Regional Decisions Made Easy</p>
+      <h2>What does your ideal region look like?</h2>
+      <div class="field">
+        <input id="visionInput" type="text"
+          placeholder="e.g., Coastal vibe, cafés within walking distance, not too hot…" />
+        <button class="btn" id="visionGo">Go</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT (hidden until step1 completed) -->
+  <div class="layout hidden" id="mainLayout">
+    <main class="main-content">
+
+      <!-- STEP 2: City -->
+      <section id="step2">
+        <div class="center">
+          <h2>What kind of place do you want to call home?</h2>
+          <div class="field">
+            <input id="cityQuery" type="search" placeholder="Search a city, e.g., Melbourne / Hobart / Devonport…" />
+            <button class="btn" id="cityGo">Go</button>
+          </div>
+        </div>
+        <div id="cityGrid" class="grid"></div>
+      </section>
+
+      <!-- STEP 3: Job -->
+      <section id="step3">
+        <div class="center">
+          <h2>What kind of job are you looking for?</h2>
+          <div class="field">
+            <input id="jobQuery" type="search"
+              placeholder="Type a keyword first (e.g., 'marketing', 'nurse', 'developer')…" />
+            <button class="btn" id="jobGo">Go</button>
+          </div>
+        </div>
+        <div id="jobGrid" class="grid hidden"></div>
+      </section>
+
+      <!-- STEP 4: Place -->
+      <section id="step4">
+        <div class="center">
+          <h2>What does your ideal home look like?</h2>
+          <div class="filters">
+            <div class="filter-section">
+              <div class="filter-row">
+                <div class="price-group">
+                  <div class="filter-label">Weekly Rent Range</div>
+                  <div class="price-inputs">
+                    <input id="rentMin" type="number" placeholder="Min" />
+                    <span class="price-separator">—</span>
+                    <input id="rentMax" type="number" placeholder="Max" />
+                  </div>
+                  <div class="muted" style="font-size: 12px;">$ per week</div>
+                </div>
+
+                <div class="select-group">
+                  <div class="filter-label">Bedrooms</div>
+                  <select id="beds">
+                    <option value="">Any</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4+</option>
+                  </select>
+                </div>
+
+                <div class="select-group">
+                  <div class="filter-label">Bathrooms</div>
+                  <select id="baths">
+                    <option value="">Any</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3+</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="keyword-section">
+              <div class="keyword-label">Or explain it</div>
+              <div class="keyword-input">
+                <input id="placeKeyword" type="text"
+                  placeholder="e.g., near station, garage, pet-friendly, furnished, balcony, parking..." />
+                <button class="btn search-button" id="placeGo">Search Homes</button>
+              </div>
+              <div class="muted" style="font-size: 13px; text-align: center;">
+                Search for specific features, locations, or amenities
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="placeGrid" class="grid hidden"></div>
+      </section>
+
+      <div class="center" style="padding:40px 20px 0;">
+        <div class="muted" style="font-size:12px">
+          Photo credits: Wikimedia Commons & Unsplash (see URLs in code). Replace or add via <code>IMAGE_MAP</code>,
+          <code>JOB_IMAGE_MAP</code>, <code>HOME_IMAGE_MAP</code>.
+        </div>
+      </div>
+    </main>
+
+    <div class="resize-handle" id="resizeHandle">
+      <button class="resize-toggle" id="resizeToggle" title="Expand to full page">⤢</button>
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+      <h3>Your selections</h3>
+      <div id="chips"></div>
+
+      <h3>City details</h3>
+      <div id="cityInfoBox" class="muted">Pick a city to see details here.</div>
+
+      <h3>Summary</h3>
+      <div id="summary" class="muted">No selections yet — start above.</div>
+
+      <div class="chat">
+        <h3>Your AI Move Mate</h3>
+
+        <div class="chat-suggestions" id="chatSuggestions">
+          <h4>Quick questions about your selections:</h4>
+          <div class="suggestion-buttons">
+            <button class="suggestion-btn" id="suggestion1"></button>
+            <button class="suggestion-btn" id="suggestion2"></button>
+            <button class="suggestion-btn" id="suggestion3"></button>
+          </div>
+        </div>
+
+        <div class="chat-log" id="chatLog" aria-live="polite"></div>
+        <div class="chat-input">
+          <input id="chatInput" type="text" placeholder="Ask me anything… e.g., Is there a hospital nearby?" />
+          <div class="chat-actions">
+            <button class="btn" id="chatSend">Send</button>
+            <button class="export-btn" id="exportPlan" title="Export your plan as PDF">📄 Export Plan</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <button class="sidebar-toggle" id="sidebarToggle">‹</button>
+    <button class="sidebar-back" id="sidebarBack" title="Back to split view">←</button>
+  </div>
+
+  <script>
+    // ---------- Chat functionality ----------
+    async function askAI(message) {
+      const res = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+      if (!res.ok) throw new Error(`Backend error: ${res.status} ${await res.text()}`);
+      const data = await res.json();
+      return data.reply;
+    }
+
+    function pushChat(sender, text) {
+      const chatLog = document.getElementById("chatLog");
+      const div = document.createElement("div");
+      div.className = "chat-item";
+      div.innerHTML = `<div class="who">${sender}</div><div>${text}</div>`;
+      chatLog.appendChild(div);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    async function handleChatSend() {
+      const chatInput = document.getElementById("chatInput");
+      const chatSend = document.getElementById("chatSend");
+      const text = chatInput.value.trim();
+
+      if (!text) return;
+
+      pushChat("You", text);
+      chatInput.value = "";
+      chatSend.disabled = true;
+
+      try {
+        const reply = await askAI(text);
+        pushChat("RegionalMate", reply || "I'm here to help with your regional planning questions!");
+      } catch (err) {
+        pushChat("RegionalMate", "Sorry, I'm having trouble connecting right now. Please try again later.");
+        console.error('Chat error:', err);
+      } finally {
+        chatSend.disabled = false;
+      }
+    }
+
+    // ---------- Image maps ----------
+    const IMAGE_MAP = {
+      "Melbourne": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Melbourne_skyline_and_Yarra_River.jpg",
+      "Sydney": "https://upload.wikimedia.org/wikipedia/commons/a/af/Sydney_Opera_House_Sails.jpg",
+      "Brisbane": "https://upload.wikimedia.org/wikipedia/commons/5/52/Brisbane_City_Skyline%2C_2012.jpg",
+      "Perth": "https://upload.wikimedia.org/wikipedia/commons/3/36/Perth_skyline_from_Kings_Park.jpg",
+      "Adelaide": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Adelaide_skyline%2C_December_2022.jpg",
+      "Hobart": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Hobart_seen_from_the_east.jpg",
+      "Launceston": "https://upload.wikimedia.org/wikipedia/commons/2/27/Launceston_Panorama.jpg",
+      "Devonport": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Devonport%2C_TAS.JPG",
+      "Bendigo": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Aerial_-_Bendigo_2.jpg",
+      "Ballarat": "https://picsum.photos/seed/ballarat/1200/800"
+    };
+    // Job category → image
+    const JOB_IMAGE_MAP = {
+      "Tech": "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1400&auto=format&fit=crop",
+      "Healthcare": "https://images.unsplash.com/photo-1580281657527-47d7c0d289a6?q=80&w=1400&auto=format&fit=crop",
+      "Education": "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=1400&auto=format&fit=crop",
+      "Government & Public Sector": "https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?q=80&w=1400&auto=format&fit=crop",
+      "Supply Chain & Logistics": "https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=1400&auto=format&fit=crop",
+      "Hospitality & Tourism": "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?q=80&w=1400&auto=format&fit=crop",
+      "Construction": "https://images.unsplash.com/photo-1487956382158-bb926046304a?q=80&w=1400&auto=format&fit=crop",
+      "Retail": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1400&auto=format&fit=crop",
+      "Manufacturing": "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?q=80&w=1400&auto=format&fit=crop",
+      "Creative": "https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=1400&auto=format&fit=crop"
+    };
+    // Dwelling type → image
+    const HOME_IMAGE_MAP = {
+      "Apartment": "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400&auto=format&fit=crop",
+      "House": "https://images.unsplash.com/photo-1560448204-603b3fc33ddc?q=80&w=1400&auto=format&fit=crop",
+      "Townhouse": "https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=1400&auto=format&fit=crop",
+      "Unit": "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1400&auto=format&fit=crop"
+    };
+
+    // ---------- Base cities ----------
+    const baseCities = [
+      { name: "Devonport", state: "TAS", population: 25000, medianRent: 320, medianHousePrice: 380000, climate: "Mild coastal, 14–22℃", lifestyle: "Beaches, national parks, ferry", jobs: ["Tourism", "Logistics", "Retail"], closest: "Launceston" },
+      { name: "Bendigo", state: "VIC", population: 95000, medianRent: 380, medianHousePrice: 450000, climate: "Four seasons, 12–25℃", lifestyle: "Arts, wine, festivals", jobs: ["Healthcare", "Education", "Gov", "Mining"], closest: "Melbourne" },
+      { name: "Ballarat", state: "VIC", population: 110000, medianRent: 390, medianHousePrice: 485000, climate: "Cool temperate, 8–23℃", lifestyle: "Heritage, galleries", jobs: ["Education", "Healthcare", "Gov", "Manufacturing"], closest: "Melbourne" },
+      { name: "Melbourne", state: "VIC", population: 5000000, medianRent: 520, medianHousePrice: 780000, climate: "Oceanic, 7–26℃", lifestyle: "Cafés, culture, jobs", jobs: ["Tech", "Finance", "Uni", "Health"], closest: "—" },
+      { name: "Sydney", state: "NSW", population: 5300000, medianRent: 680, medianHousePrice: 1200000, climate: "Subtropical, 10–27℃", lifestyle: "Harbour, beaches", jobs: ["Finance", "Media", "Tech"], closest: "—" },
+      { name: "Brisbane", state: "QLD", population: 2500000, medianRent: 520, medianHousePrice: 750000, climate: "Subtropical, 15–30℃", lifestyle: "River, outdoor", jobs: ["Construction", "Health", "Retail"], closest: "Gold Coast" },
+      { name: "Perth", state: "WA", population: 2100000, medianRent: 520, medianHousePrice: 650000, climate: "Mediterranean", lifestyle: "Beaches, parks", jobs: ["Mining", "Energy", "Health"], closest: "Fremantle" },
+      { name: "Adelaide", state: "SA", population: 1400000, medianRent: 470, medianHousePrice: 650000, climate: "Mediterranean", lifestyle: "Festivals, wine", jobs: ["Health", "Gov", "Defense"], closest: "—" },
+      { name: "Hobart", state: "TAS", population: 240000, medianRent: 480, medianHousePrice: 620000, climate: "Cool temperate", lifestyle: "Harbour, MONA", jobs: ["Tourism", "Edu", "Gov"], closest: "—" },
+      { name: "Launceston", state: "TAS", population: 110000, medianRent: 380, medianHousePrice: 480000, climate: "Cool temperate", lifestyle: "Gorge, parks", jobs: ["Retail", "Health"], closest: "Hobart" }
+    ];
+
+    // ---------- Mock jobs & places ----------
+    const JOBS_DB = [];
+    const PLACES_DB = [];
+    const industries = ["Digital Marketing", "Brand Marketing", "Content Marketing", "Social Media Marketing", "Email Marketing", "SEO/SEM Marketing", "Product Marketing", "Event Marketing", "Marketing Analytics", "Marketing Communications"];
+    const companies = ["Tourism Tasmania", "TT-Line", "Devonport City Council", "Bendigo Health", "Ballarat Council", "University of Tasmania", "Monash University", "Woolworths", "Coles", "JB Hi-Fi", "Harvey Norman", "Flight Centre", "RACV", "ANZ Bank", "Telstra"];
+    const titles = ["Specialist", "Coordinator", "Manager", "Executive", "Assistant", "Officer", "Analyst", "Strategist", "Lead", "Director"];
+
+    // Realistic Devonport accommodation data
+    const devonportPlaces = [
+      {
+        id: "dev_001",
+        type: "1BR Townhouse",
+        location: "CBD",
+        price: { weekly: 280, monthly: 1213, currency: "AUD" },
+        specs: { bedrooms: 1, bathrooms: 1, parking: "1 car space", pet_friendly: false },
+        key_features: ["Air conditioning", "Available now", "Modern kitchen", "City views"],
+        distances: { cbd: "2 min walk", beach: "800m", supermarket: "1 min walk", hospital: "5 min drive" },
+        utilities: { internet_ready: true, heating: "Electric", included: ["Water"] }
+      },
+      {
+        id: "dev_002",
+        type: "3BR Apartment",
+        location: "Industrial",
+        price: { weekly: 350, monthly: 1516, currency: "AUD" },
+        specs: { bedrooms: 3, bathrooms: 1, parking: "2 car spaces", pet_friendly: true },
+        key_features: ["Utilities included", "12-month lease", "Balcony", "Near station"],
+        distances: { cbd: "8 min drive", beach: "1.2km", supermarket: "3 min drive", hospital: "7 min drive" },
+        utilities: { internet_ready: true, heating: "Gas", included: ["Water", "Electricity"] }
+      },
+      {
+        id: "dev_003",
+        type: "2BR House",
+        location: "West Devonport",
+        price: { weekly: 320, monthly: 1386, currency: "AUD" },
+        specs: { bedrooms: 2, bathrooms: 1, parking: "1 car space", pet_friendly: false },
+        key_features: ["Private balcony", "Garden", "Split system", "Available now"],
+        distances: { cbd: "15 min walk", beach: "1.2km", supermarket: "5 min walk", hospital: "8 min drive" },
+        utilities: { internet_ready: true, heating: "Electric", included: ["Garden maintenance"] }
+      },
+      {
+        id: "dev_004",
+        type: "4BR House",
+        location: "North Devonport",
+        price: { weekly: 420, monthly: 1819, currency: "AUD" },
+        specs: { bedrooms: 4, bathrooms: 2, parking: "2 car spaces", pet_friendly: true },
+        key_features: ["Ocean views", "Large yard", "Garage", "Pet friendly"],
+        distances: { cbd: "10 min drive", beach: "400m", supermarket: "5 min drive", hospital: "12 min drive" },
+        utilities: { internet_ready: true, heating: "Gas", included: ["Water", "Council rates"] }
+      }
+    ];
+
+    function r(n) { return Math.floor(Math.random() * n) }
+    function pick(arr) { return arr[r(arr.length)] }
+
+    for (let i = 0; i < 500; i++) {
+      const city = pick(baseCities).name;
+      const industry = pick(industries);
+      const title = pick(titles);
+      const workType = pick(["Full-time", "Part-time", "Contract", "Casual"]);
+      const experience = pick(["Entry level", "1-2 years", "2-5 years", "5+ years", "Senior level"]);
+      const benefits = pick([
+        ["Health insurance", "Remote work", "Professional development"],
+        ["Flexible hours", "Parking", "Team events"],
+        ["Annual bonus", "Gym membership", "Study assistance"],
+        ["Company car", "Travel allowances", "Performance bonus"],
+        ["Pension plan", "Flexible leave", "Training budget"]
+      ]);
+
+      JOBS_DB.push({
+        id: "J" + i,
+        city,
+        title: `${industry} ${title}`,
+        company: pick(companies),
+        salary: `$${(55 + r(70))},000 – $${(80 + r(90))},000`,
+        workType: workType,
+        experience: experience,
+        benefits: benefits,
+        posted: pick(["2 days ago", "1 week ago", "3 days ago", "5 days ago", "1 day ago"]),
+        applications: r(50) + 5,
+        key: pick(["Google Ads", "Facebook Ads", "SEO/SEM", "Content creation", "Brand strategy", "Email campaigns", "Social media", "Analytics", "CRM management", "Adobe Creative Suite", "Canva", "HubSpot", "Mailchimp", "Google Analytics"])
+      });
+
+      // Use realistic Devonport data for Devonport, generate for others
+      if (city === "Devonport" && i < devonportPlaces.length) {
+        PLACES_DB.push(devonportPlaces[i]);
+      } else {
+        const br = 1 + r(4), ba = 1 + r(3);
+        const weeklyRent = city === "Devonport" ? 250 + r(200) :
+          city === "Melbourne" ? 400 + r(300) :
+            city === "Sydney" ? 500 + r(400) :
+              city === "Brisbane" ? 350 + r(250) :
+                city === "Perth" ? 320 + r(250) :
+                  city === "Adelaide" ? 300 + r(200) :
+                    city === "Hobart" ? 300 + r(250) :
+                      city === "Launceston" ? 250 + r(180) :
+                        280 + r(220); // Bendigo, Ballarat and others
+        const locations = city === "Devonport" ? ["East Devonport", "West Devonport", "North Devonport", "CBD"] : ["North", "South", "East", "West", "Central"];
+        const dwellingTypes = ["Apartment", "House", "Townhouse", "Unit"];
+        const features = ["Near train station", "Ocean views", "Modern kitchen", "Private balcony", "Garden", "Split system", "Air conditioning", "Garage", "Study room", "Walk-in robe"];
+        const utilities = [["Water", "Council rates"], ["Garden maintenance"], ["Internet"], ["Gas"], ["Electricity included"]];
+        const heating = ["Gas", "Electric", "Reverse cycle", "Wood heating"];
+
+        const location = pick(locations);
+        const type = pick(dwellingTypes);
+
+        PLACES_DB.push({
+          id: "P" + i,
+          type: `${br}BR ${type}`,
+          location: city === "Devonport" ? location : `${location} ${city}`,
+          price: {
+            weekly: weeklyRent,
+            monthly: Math.round(weeklyRent * 4.33),
+            currency: "AUD"
+          },
+          specs: {
+            bedrooms: br,
+            bathrooms: ba,
+            parking: `${r(3) + 1} car space${r(3) + 1 > 1 ? 's' : ''}`,
+            pet_friendly: r(2) === 1
+          },
+          key_features: [
+            pick(features),
+            pick(features),
+            pick(["Available now", "Available 2 weeks", "Furnished", "Unfurnished"]),
+            pick(features)
+          ],
+          distances: {
+            cbd: city === "Devonport" ? `${r(15) + 2} min ${r(2) === 1 ? 'walk' : 'drive'}` : `${r(20) + 2} min ${r(2) === 1 ? 'walk' : 'drive'}`,
+            beach: city === "Devonport" ? `${(r(10) + 2) / 10}km` : `${(r(30) + 2) / 10}km`,
+            supermarket: `${r(10) + 1} min ${r(2) === 1 ? 'walk' : 'drive'}`,
+            hospital: `${r(15) + 5} min drive`
+          },
+          utilities: {
+            internet_ready: r(2) === 1,
+            heating: pick(heating),
+            included: pick(utilities)
+          }
+        });
+      }
+    }
+
+    // ---------- Helpers ----------
+    const $ = (id) => document.getElementById(id);
+    const state = { vision: "", city: null, job: null, place: null };
+    function scrollToNext(afterId) {
+      const elAfter = document.querySelector(`#${afterId}`).nextElementSibling || document.querySelector('#step2');
+      elAfter?.scrollIntoView({ behavior: 'smooth' });
+    }
+    function fmt(n) { return n.toLocaleString('en-AU') }
+    function imageForCity(city) { return IMAGE_MAP[city] || `https://picsum.photos/seed/${encodeURIComponent(city)}/1200/800`; }
+    function industryFromTitle(t) { return industries.find(ind => t.startsWith(ind)) || "Digital Marketing"; }
+    function jobImageFor(j) { const ind = industryFromTitle(j.title); return JOB_IMAGE_MAP[ind] || JOB_IMAGE_MAP["Tech"]; }
+    function homeTypeFromTitle(t) {
+      if (t.includes("Apartment")) return "Apartment";
+      if (t.includes("Townhouse")) return "Townhouse";
+      if (t.includes("Unit")) return "Unit";
+      return "House";
+    }
+    function placeImageFor(p) { const kind = homeTypeFromTitle(p.type); return HOME_IMAGE_MAP[kind] || HOME_IMAGE_MAP["House"]; }
+    function ensureAtLeast(list, n, fallback) {
+      let out = [...list];
+      if (out.length >= n) return out;
+      for (const item of fallback) {
+        if (!out.find(x => x.id === item.id)) out.push(item);
+        if (out.length >= n) break;
+      }
+      return out;
+    }
+    function ensureAtLeastN(pool, n, relaxedPools) {
+      let out = pool.slice();
+      for (const rp of relaxedPools) {
+        out = ensureAtLeast(out, n, rp);
+        if (out.length >= n) break;
+      }
+      return out;
+    }
+
+    // ---------- Rendering ----------
+    function cityCard(c) {
+      return `<article class="card">
+    <div class="thumb"><img src="${imageForCity(c.name)}" alt="${c.name} image"/></div>
+    <div class="content">
+      <div class="body">
+        <div class="title">${c.name} <span class="meta">(${c.state})</span></div>
+        <div class="meta">👥 Population: ${fmt(c.population)}</div>
+        <div class="meta">💵 Median rent: $${c.medianRent}/week</div>
+        <div class="meta">🏠 Median house: $${fmt(c.medianHousePrice)}</div>
+        <div class="meta">🌦️ Climate: ${c.climate}</div>
+        <div class="meta">🎒 Lifestyle: ${c.lifestyle}</div>
+        <div class="meta">🧭 Closest city: ${c.closest}</div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="pickCity('${c.name}')">Let's plan</button>
+      </div>
+    </div>
+  </article>`;
+    }
+    function jobCard(j) {
+      return `<article class="card">
+    <div class="thumb"><img src="${jobImageFor(j)}" alt="${j.title} image"/></div>
+    <div class="content">
+      <div class="body">
+        <div class="title">${j.title}</div>
+        <div class="meta">🏢 ${j.company} ・ 📍 ${j.city}</div>
+        <div class="meta">💰 Salary: ${j.salary}</div>
+        <div class="meta">⏰ ${j.workType} ・ 📈 ${j.experience}</div>
+        <div class="meta">🔧 Key skill: ${j.key}</div>
+        <div class="meta">✨ Benefits: ${j.benefits.slice(0, 2).join(', ')}</div>
+        <div class="meta">📅 Posted: ${j.posted} ・ 👥 ${j.applications} applicants</div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="pickJob('${j.id}')">Apply Now</button>
+      </div>
+    </div>
+  </article>`;
+    }
+    function placeCard(p) {
+      return `<article class="card">
+    <div class="thumb"><img src="${placeImageFor(p)}" alt="${p.type} image"/></div>
+    <div class="content">
+      <div class="body">
+        <div class="title">${p.type} — ${p.location}</div>
+        <div class="meta">💰 $${p.price.weekly}/week • ${p.specs.bedrooms}BR ${p.specs.bathrooms}BA</div>
+        <div class="meta">✨ ${p.key_features.slice(0, 2).join(', ')}</div>
+        <div class="meta">🚗 ${p.specs.parking} • ${p.specs.pet_friendly ? '🐕 Pet friendly' : '🚫 No pets'}</div>
+        <div class="meta">📍 CBD: ${p.distances.cbd} • Beach: ${p.distances.beach}</div>
+        <div class="meta">🏪 Supermarket: ${p.distances.supermarket} • Hospital: ${p.distances.hospital}</div>
+        <div class="meta">🔌 ${p.utilities.heating} heating • ${p.utilities.included.join(', ')} included</div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="pickPlace('${p.id}')">Save</button>
+      </div>
+    </div>
+  </article>`;
+    }
+
+    // ---------- Sidebar ----------
+    function updateSidebar() {
+      const chips = $('chips'); chips.innerHTML = '';
+      if (state.city) chips.innerHTML += `<div class="chip"><span>📍 ${state.city}</span><button class="icon-btn" onclick="state.city=null;updateSidebar();renderSummary()">✕</button></div>`;
+      if (state.job) chips.innerHTML += `<div class="chip"><span>💼 ${state.job.title} @ ${state.job.company} (${state.job.workType})</span><button class="icon-btn" onclick="state.job=null;updateSidebar();renderSummary()">✕</button></div>`;
+      if (state.place) chips.innerHTML += `<div class="chip"><span>🏠 ${state.place.type} $${state.place.price.weekly}/wk</span><button class="icon-btn" onclick="state.place=null;updateSidebar();renderSummary()">✕</button></div>`;
+      renderSummary();
+      renderCityInfo();
+      updateChatSuggestions();
+    }
+
+    function updateChatSuggestions() {
+      const suggestions = $('chatSuggestions');
+      const suggestion1 = $('suggestion1');
+      const suggestion2 = $('suggestion2');
+      const suggestion3 = $('suggestion3');
+
+      // Only show suggestions if both job and place are selected
+      if (state.job && state.place && state.city) {
+        suggestions.classList.add('visible');
+
+        // Generate context-aware suggestions based on selections
+        const cityName = state.city;
+        const jobTitle = state.job.title;
+        const homeType = state.place.type;
+        const rent = state.place.price.weekly;
+
+        suggestion1.textContent = `What's the typical commute time from ${state.place.location} to ${state.job.company} in ${cityName}?`;
+        suggestion2.textContent = `Are there good schools, hospitals, and shopping centers near my ${homeType} in ${state.place.location}?`;
+        suggestion3.textContent = `What's the cost of living like in ${cityName} with a $${rent}/week rent and a ${jobTitle} salary?`;
+
+        // Add click handlers
+        suggestion1.onclick = () => sendSuggestionToChat(suggestion1.textContent);
+        suggestion2.onclick = () => sendSuggestionToChat(suggestion2.textContent);
+        suggestion3.onclick = () => sendSuggestionToChat(suggestion3.textContent);
+      } else {
+        suggestions.classList.remove('visible');
+      }
+    }
+
+    function sendSuggestionToChat(questionText) {
+      // Set the input value and trigger the send
+      $('chatInput').value = questionText;
+      handleChatSend();
+    }
+
+    function renderSummary() {
+      const s = $('summary');
+      if (!state.city && !state.job && !state.place) { s.textContent = "No selections yet — start above."; return; }
+      s.innerHTML = `
+    <div>📍 <strong>City:</strong> ${state.city || '—'}</div>
+    <div>💼 <strong>Job:</strong> ${state.job ? `${state.job.title} @ ${state.job.company} (${state.job.workType}, ${state.job.salary})` : '—'}</div>
+    <div>🏠 <strong>Home:</strong> ${state.place ? state.place.type + ' (' + state.place.location + ') $' + state.place.price.weekly + '/wk' : '—'}</div>
+  `;
+    }
+
+    function renderCityInfo() {
+      const box = $('cityInfoBox');
+      if (!box) return;
+      if (state.city) {
+        const c = baseCities.find(x => x.name === state.city);
+        if (!c) { box.textContent = 'Pick a city to see details here.'; return; }
+        box.innerHTML = `<div class="city-info">
+      <div><strong>${c.name}</strong> <span class="meta">(${c.state})</span></div>
+      <div>👥 Population: ${fmt(c.population)}</div>
+      <div>💵 Median rent: $${c.medianRent}/week</div>
+      <div>🏠 Median house: $${fmt(c.medianHousePrice)}</div>
+      <div>🌦️ Climate: ${c.climate}</div>
+      <div>🎒 Lifestyle: ${c.lifestyle}</div>
+      <div>🧭 Closest city: ${c.closest}</div>
+    </div>`;
+      } else {
+        box.textContent = 'Pick a city to see details here.';
+      }
+    }
+
+    // ---------- Selections ----------
+    function pickCity(name) {
+      state.city = name;
+      updateSidebar();
+
+      // Show sidebar and resize handle for the first time
+      const sidebar = $('sidebar');
+      const resizeHandle = $('resizeHandle');
+      sidebar.classList.add('visible');
+      resizeHandle.classList.add('visible');
+
+      // Scroll to job section instead of staying on city section
+      scrollToNext('step2');
+    }
+    function pickJob(id) {
+      state.job = JOBS_DB.find(x => x.id === id);
+      updateSidebar();
+      scrollToNext('step3');
+    }
+
+    function pickPlace(id) {
+      state.place = PLACES_DB.find(x => x.id === id);
+      updateSidebar();
+
+      // If both job and place are selected, scroll to show the chat area
+      if (state.job && state.place) {
+        setTimeout(() => {
+          const chatSection = $('chatLog');
+          if (chatSection) {
+            chatSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 500);
+      }
+    }
+
+    // ---------- Search handlers ----------
+    function showCities(q) {
+      const qn = q?.trim().toLowerCase();
+      let pool = baseCities.filter(c => !qn || c.name.toLowerCase().includes(qn));
+      if (pool.length === 0) pool = baseCities.slice(0, 6);
+      if (!qn) { // default trio
+        const preferred = ["Devonport", "Bendigo", "Ballarat"];
+        pool = preferred.map(name => baseCities.find(c => c.name === name));
+      }
+      $('cityGrid').innerHTML = pool.slice(0, 3).map(cityCard).join("");
+    }
+    function showJobs(q) {
+      const qq = q?.trim().toLowerCase();
+      let pool = JOBS_DB.filter(j => (!state.city || j.city === state.city) && (!qq || j.title.toLowerCase().includes(qq)));
+      pool = ensureAtLeastN(pool, 4, [
+        JOBS_DB.filter(j => (!state.city || j.city === state.city)),
+        JOBS_DB
+      ]);
+      $('jobGrid').classList.remove('hidden');
+      const outCount = Math.max(4, Math.min(pool.length, 8)); // 4–8
+      $('jobGrid').innerHTML = pool.slice(0, outCount).map(jobCard).join("");
+    }
+    function showPlaces() {
+      const min = parseInt($('rentMin').value || 0, 10);
+      const max = parseInt($('rentMax').value || 99999, 10);
+      const beds = $('beds').value;
+      const baths = $('baths').value;
+      const kw = (document.getElementById('placeKeyword')?.value || '').trim().toLowerCase();
+      let pool = PLACES_DB.filter(p => (!state.city || p.location.includes(state.city)) && p.price.weekly >= min && p.price.weekly <= max);
+      if (beds) pool = pool.filter(p => String(p.specs.bedrooms) === beds);
+      if (baths) pool = pool.filter(p => String(p.specs.bathrooms) === baths);
+      if (kw) pool = pool.filter(p =>
+        p.key_features.some(f => f.toLowerCase().includes(kw)) ||
+        p.location.toLowerCase().includes(kw) ||
+        p.type.toLowerCase().includes(kw) ||
+        p.specs.parking.toLowerCase().includes(kw)
+      );
+      pool = ensureAtLeastN(pool, 4, [
+        PLACES_DB.filter(p => (!state.city || p.location.includes(state.city)) && p.price.weekly >= min && p.price.weekly <= max),
+        PLACES_DB.filter(p => (!state.city || p.location.includes(state.city))),
+        PLACES_DB
+      ]);
+      $('placeGrid').classList.remove('hidden');
+      const outCount = Math.max(4, Math.min(pool.length, 8));
+      $('placeGrid').innerHTML = pool.slice(0, outCount).map(placeCard).join("");
+    }
+
+    // ---------- Chatbot ----------
+    const CHAT_KB = [
+      { kw: ["hospital", "medical", "clinic"], a: "Most Australian cities have public & private hospitals. After you pick a city, I can list nearby hospitals and GP clinics (typical 10–20 min drive)." },
+      { kw: ["school", "education", "college", "university"], a: "I can show nearby public/private schools and university options with quick notes once a city is selected." },
+      { kw: ["crime", "safe", "safety"], a: "Safety varies by suburb and time of day. Check local police stats and community groups for current insights." },
+      { kw: ["climate", "weather", "temperature"], a: "I'll summarise monthly averages and extremes so you can plan heating/AC." },
+      { kw: ["transport", "bus", "train", "commute"], a: "I can estimate commute times to CBD, hospitals, schools or the airport using local transport options." },
+    ];
+    function botReply(q) {
+      const lower = q.toLowerCase();
+      const hit = CHAT_KB.find(x => x.kw.some(k => lower.includes(k)));
+      if (hit) return hit.a;
+      return state.city
+        ? `Around ${state.city}, I can help with hospitals, schools, commute, climate and living costs. Tell me what you care about most.`
+        : "I can help with hospitals, schools, commute, climate and living costs. Pick a city to get tailored info.";
+    }
+
+    async function askAI(message) {
+      const res = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+      if (!res.ok) throw new Error(`Backend error: ${res.status} ${await res.text()}`);
+      const data = await res.json();
+      return data.reply;
+    }
+
+    // ---------- Events ----------
+    $('openFaq').addEventListener('click', () => {
+      const p = $('faqPanel'); const open = !p.classList.contains('open');
+      p.classList.toggle('open', open); p.setAttribute('aria-hidden', String(!open));
+    });
+    $('visionGo').addEventListener('click', () => {
+      state.vision = $('visionInput').value.trim();
+      if (!state.vision) return;
+      $('mainLayout').classList.remove('hidden');
+      updateSidebar(); showCities("");
+      scrollToNext('step1');
+    });
+    $('cityGo').addEventListener('click', () => showCities($('cityQuery').value));
+    $('jobGo').addEventListener('click', () => showJobs($('jobQuery').value));
+    $('placeGo').addEventListener('click', showPlaces);
+    $('chatSend').addEventListener('click', handleChatSend);
+    $('chatInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        handleChatSend();
+      }
+    });
+
+    // Export plan functionality
+    $('exportPlan').addEventListener('click', () => {
+      generatePlanPDF();
+    });
+
+    function generatePlanPDF() {
+      // Check if user has made sufficient selections
+      if (!state.city || !state.job || !state.place) {
+        alert('Please complete your selections (city, job, and accommodation) before exporting your plan.');
+        return;
+      }
+
+      // Collect chat history for insights
+      const chatHistory = Array.from($('chatLog').children).map(item => {
+        const who = item.querySelector('.who')?.textContent || '';
+        const message = item.textContent.replace(who, '').trim();
+        return { who, message };
+      });
+
+      // Generate comprehensive plan content
+      const planContent = generatePlanContent(chatHistory);
+
+      // Create and download PDF
+      createPDF(planContent);
+    }
+
+    function generatePlanContent(chatHistory) {
+      const city = baseCities.find(c => c.name === state.city);
+      const currentDate = new Date().toLocaleDateString('en-AU', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      return {
+        title: `Regional Life Plan: ${state.city}`,
+        subtitle: `Generated on ${currentDate}`,
+        vision: state.vision || 'Not specified',
+        city: {
+          name: city.name,
+          state: city.state,
+          population: fmt(city.population),
+          medianRent: `$${city.medianRent}/week`,
+          medianHousePrice: fmt(city.medianHousePrice),
+          climate: city.climate,
+          lifestyle: city.lifestyle,
+          closest: city.closest
+        },
+        job: {
+          title: state.job.title,
+          company: state.job.company,
+          salary: state.job.salary,
+          key: state.job.key
+        },
+        accommodation: {
+          type: state.place.type,
+          location: state.place.location,
+          weeklyRent: state.place.price.weekly,
+          monthlyRent: Math.round(state.place.price.monthly),
+          specs: `${state.place.specs.bedrooms}BR ${state.place.specs.bathrooms}BA`,
+          parking: state.place.specs.parking,
+          petFriendly: state.place.specs.pet_friendly,
+          features: state.place.key_features.join(', '),
+          distances: state.place.distances,
+          utilities: state.place.utilities
+        },
+        insights: extractInsightsFromChat(chatHistory),
+        actionItems: generateActionItems()
+      };
+    }
+
+    function extractInsightsFromChat(chatHistory) {
+      const insights = [];
+      chatHistory.forEach(chat => {
+        if (chat.who === 'RegionalMate' && chat.message.length > 50) {
+          insights.push(chat.message);
+        }
+      });
+      return insights.slice(0, 5); // Top 5 insights
+    }
+
+    function generateActionItems() {
+      const actions = [
+        `Research ${state.job.company} and prepare application materials for ${state.job.title} position`,
+        `Contact real estate agents about ${state.place.type} in ${state.place.location}`,
+        `Visit ${state.city} to explore neighborhoods and get a feel for the area`,
+        `Research schools, healthcare, and amenities in ${state.place.location}`,
+        `Calculate moving costs and budget for $${state.place.price.weekly}/week rent`,
+        `Connect with local community groups and professional networks in ${state.city}`,
+        `Research transportation options and commute routes to ${state.job.company}`
+      ];
+      return actions;
+    }
+
+    function createPDF(content) {
+      // Create a simple HTML document for PDF generation
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>${content.title}</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; color: #333; }
+            .header { text-align: center; border-bottom: 2px solid #7dd3fc; padding-bottom: 20px; margin-bottom: 30px; }
+            .title { color: #0b1220; font-size: 28px; margin-bottom: 5px; }
+            .subtitle { color: #666; font-size: 14px; }
+            .section { margin-bottom: 30px; }
+            .section h2 { color: #7dd3fc; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+            .section h3 { color: #0b1220; margin-top: 20px; }
+            .details { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0; }
+            .details p { margin: 5px 0; }
+            .action-list { list-style-type: none; padding: 0; }
+            .action-list li { background: #e3f2fd; margin: 8px 0; padding: 12px; border-radius: 6px; border-left: 4px solid #7dd3fc; }
+            .insight { background: #f0f9ff; padding: 12px; margin: 10px 0; border-radius: 6px; border-left: 4px solid #22d3ee; font-style: italic; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="title">${content.title}</h1>
+            <p class="subtitle">${content.subtitle}</p>
+          </div>
+
+          <div class="section">
+            <h2>🎯 Your Vision</h2>
+            <div class="details">
+              <p><strong>Ideal Region:</strong> ${content.vision}</p>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>📍 Selected City: ${content.city.name}</h2>
+            <div class="details">
+              <p><strong>Location:</strong> ${content.city.name}, ${content.city.state}</p>
+              <p><strong>Population:</strong> ${content.city.population}</p>
+              <p><strong>Median Rent:</strong> ${content.city.medianRent}</p>
+              <p><strong>Median House Price:</strong> $${content.city.medianHousePrice}</p>
+              <p><strong>Climate:</strong> ${content.city.climate}</p>
+              <p><strong>Lifestyle:</strong> ${content.city.lifestyle}</p>
+              <p><strong>Nearest Major City:</strong> ${content.city.closest}</p>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>💼 Career Opportunity</h2>
+            <div class="details">
+              <p><strong>Position:</strong> ${content.job.title}</p>
+              <p><strong>Company:</strong> ${content.job.company}</p>
+              <p><strong>Salary Range:</strong> ${content.job.salary}</p>
+              <p><strong>Key Skills:</strong> ${content.job.key}</p>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>🏠 Accommodation Plan</h2>
+            <div class="details">
+              <p><strong>Property:</strong> ${content.accommodation.type} in ${content.accommodation.location}</p>
+              <p><strong>Rent:</strong> $${content.accommodation.weeklyRent}/week ($${content.accommodation.monthlyRent}/month)</p>
+              <p><strong>Specifications:</strong> ${content.accommodation.specs}, ${content.accommodation.parking}</p>
+              <p><strong>Pet Policy:</strong> ${content.accommodation.petFriendly ? 'Pet friendly' : 'No pets allowed'}</p>
+              <p><strong>Features:</strong> ${content.accommodation.features}</p>
+              
+              <h3>📍 Location Details</h3>
+              <p><strong>CBD:</strong> ${content.accommodation.distances.cbd}</p>
+              <p><strong>Beach:</strong> ${content.accommodation.distances.beach}</p>
+              <p><strong>Supermarket:</strong> ${content.accommodation.distances.supermarket}</p>
+              <p><strong>Hospital:</strong> ${content.accommodation.distances.hospital}</p>
+              
+              <h3>🔌 Utilities</h3>
+              <p><strong>Heating:</strong> ${content.accommodation.utilities.heating}</p>
+              <p><strong>Included:</strong> ${content.accommodation.utilities.included.join(', ')}</p>
+            </div>
+          </div>
+
+          ${content.insights.length > 0 ? `
+          <div class="section">
+            <h2>💡 AI Insights</h2>
+            ${content.insights.map(insight => `<div class="insight">${insight}</div>`).join('')}
+          </div>
+          ` : ''}
+
+          <div class="section">
+            <h2>✅ Action Plan</h2>
+            <ul class="action-list">
+              ${content.actionItems.map(action => `<li>${action}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>📊 Financial Summary</h2>
+            <div class="details">
+              <p><strong>Weekly Accommodation Cost:</strong> $${content.accommodation.weeklyRent}</p>
+              <p><strong>Monthly Accommodation Cost:</strong> $${content.accommodation.monthlyRent}</p>
+              <p><strong>Expected Salary Range:</strong> ${content.job.salary}</p>
+              <p><strong>Accommodation as % of minimum salary:</strong> ${Math.round((content.accommodation.monthlyRent * 12) / (55000) * 100)}% of $55,000</p>
+            </div>
+          </div>
+
+          <div class="section">
+            <p style="text-align: center; color: #666; font-size: 12px; margin-top: 40px;">
+              Generated by RegionalMate - Regional Decisions Made Easy<br>
+              This plan is based on your selections and current market data. Please verify all details independently.
+            </p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      // Create a blob and download
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `RegionalMate-Plan-${state.city}-${new Date().toISOString().split('T')[0]}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Show success message
+      setTimeout(() => {
+        alert('Your regional life plan has been exported! You can open the HTML file in any browser and print to PDF if needed.');
+      }, 100);
+    }
+
+    // ---------- Image gallery (for future use)
+    const GALLERY_DB = [
+      { id: "1", city: "Melbourne", url: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Melbourne_skyline_and_Yarra_River.jpg" },
+      { id: "2", city: "Sydney", url: "https://upload.wikimedia.org/wikipedia/commons/a/af/Sydney_Opera_House_Sails.jpg" },
+      { id: "3", city: "Brisbane", url: "https://upload.wikimedia.org/wikipedia/commons/5/52/Brisbane_City_Skyline%2C_2012.jpg" },
+      { id: "4", city: "Perth", url: "https://upload.wikimedia.org/wikipedia/commons/3/36/Perth_skyline_from_Kings_Park.jpg" },
+      { id: "5", city: "Adelaide", url: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Adelaide_skyline%2C_December_2022.jpg" },
+      { id: "6", city: "Hobart", url: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Hobart_seen_from_the_east.jpg" },
+      { id: "7", city: "Launceston", url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Launceston_Panorama.jpg" },
+      { id: "8", city: "Devonport", url: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Devonport%2C_TAS.JPG" }
+    ];
+
+    function openGallery(city) {
+      const images = GALLERY_DB.filter(img => img.city === city);
+      if (images.length === 0) return;
+
+      const gallery = document.createElement('div');
+      gallery.className = 'image-gallery';
+      gallery.style.position = 'fixed';
+      gallery.style.top = 0;
+      gallery.style.left = 0;
+      gallery.style.width = '100%';
+      gallery.style.height = '100%';
+      gallery.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+      gallery.style.zIndex = 2000;
+      gallery.style.display = 'flex';
+      gallery.style.flexDirection = 'column';
+      gallery.style.alignItems = 'center';
+      gallery.style.justifyContent = 'center';
+
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = '✕';
+      closeBtn.style.position = 'absolute';
+      closeBtn.style.top = '20px';
+      closeBtn.style.right = '30px';
+      closeBtn.style.background = 'none';
+      closeBtn.style.border = 'none';
+      closeBtn.style.color = '#fff';
+      closeBtn.style.fontSize = '24px';
+      closeBtn.style.cursor = 'pointer';
+      closeBtn.onclick = () => document.body.removeChild(gallery);
+
+      const imgElements = images.map(img => {
+        const imgEl = document.createElement('img');
+        imgEl.src = img.url;
+        imgEl.alt = `${city} image`;
+        imgEl.style.maxWidth = '90%';
+        imgEl.style.maxHeight = '80%';
+        imgEl.style.margin = '10px';
+        imgEl.style.borderRadius = '8px';
+        imgEl.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
+        return imgEl;
+      });
+
+      gallery.appendChild(closeBtn);
+      imgElements.forEach(imgEl => gallery.appendChild(imgEl));
+      document.body.appendChild(gallery);
+    }
+
+    // Resize functionality
+    let isResizing = false;
+    let startX = 0;
+    let startWidth = 0;
+    let isFullPage = false;
+
+    const resizeHandle = $('resizeHandle');
+    const resizeToggle = $('resizeToggle');
+    const sidebar = $('sidebar');
+    const layout = $('mainLayout');
+    const sidebarBack = $('sidebarBack');
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+      // Don't start resizing if clicking on the toggle button
+      if (e.target === resizeToggle) return;
+
+      isResizing = true;
+      startX = e.clientX;
+      startWidth = sidebar.offsetWidth;
+      resizeHandle.classList.add('resizing');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+
+      const diff = startX - e.clientX;
+      const newWidth = startWidth + diff;
+      const minWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-min-w'));
+      const maxWidth = window.innerWidth * 0.6; // 60vw
+
+      const clampedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+      document.documentElement.style.setProperty('--sidebar-w', clampedWidth + 'px');
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isResizing) {
+        isResizing = false;
+        resizeHandle.classList.remove('resizing');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    });
+
+    // Toggle full page mode - Fixed event handler
+    resizeToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      if (!isFullPage) {
+        // Enter full page mode
+        isFullPage = true;
+        layout.classList.add('sidebar-fullpage');
+        resizeToggle.textContent = '⤢';
+        resizeToggle.title = 'Back to split view';
+      } else {
+        // Exit full page mode
+        isFullPage = false;
+        layout.classList.remove('sidebar-fullpage');
+        resizeToggle.textContent = '⤢';
+        resizeToggle.title = 'Expand to full page';
+      }
+    });
+
+    // Back to split view - Fixed functionality
+    sidebarBack.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      isFullPage = false;
+      layout.classList.remove('sidebar-fullpage');
+      resizeToggle.textContent = '⤢';
+      resizeToggle.title = 'Expand to full page';
+    });
+
+    // Sidebar toggle for collapsed state
+    const sidebarToggleBtn = $('sidebarToggle');
+    if (sidebarToggleBtn) {
+      sidebarToggleBtn.addEventListener('click', () => {
+        sidebar.classList.remove('collapsed');
+        layout.classList.remove('sidebar-collapsed');
+      });
+    }
+
+    // Double-click resize handle to toggle
+    resizeHandle.addEventListener('dblclick', () => {
+      sidebar.classList.add('collapsed');
+      layout.classList.add('sidebar-collapsed');
+    });
+
+    // Init
+    updateSidebar();
+    renderCityInfo && renderCityInfo();
+  </script>
+</body>
+
+</html>
